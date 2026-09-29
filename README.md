@@ -239,6 +239,12 @@ bun test
 bun run bundle
 ```
 
+> **Keep the script named `bundle`, not `build`.** OpenCode's git-install
+> preparation triggers on `scripts.build` (and `prepare`/`prepack`/`install`)
+> and fails with `git dep preparation failed`; since `dist/` is committed, no
+> install-time build is needed and skipping preparation is what makes
+> `github:masciugo/opencode-ignore` installs work.
+
 ## License
 
 MIT
