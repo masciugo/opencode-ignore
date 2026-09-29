@@ -23,8 +23,8 @@
     "url": "https://github.com/masciugo/opencode-ignore/issues"
   },
   "scripts": {
-    "build": "bun build ./index.ts --outdir ./dist --target node --external=@opencode/plugin",
-    "prepublishOnly": "bun run build",
+    "bundle": "bun build ./index.ts --outdir ./dist --target node --external=@opencode/plugin",
+    "prepublishOnly": "bun run bundle",
     "test": "bun test"
   },
   "module": "./dist/index.js",

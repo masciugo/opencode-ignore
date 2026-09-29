@@ -1009,7 +1009,7 @@ describe("Distribution", () => {
       const committed = await committedFile.text()
       if (committed !== built) {
         throw new Error(
-          "dist/index.js is stale - run: npx --yes bun@1.3.1 run build (then commit dist/)",
+          "dist/index.js is stale - run: npx --yes bun@1.3.1 run bundle (then commit dist/)",
         )
       }
     } finally {

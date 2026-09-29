@@ -234,8 +234,9 @@ bun install
 # Run tests
 bun test
 
-# Build (if needed)
-bun run build
+# Rebuild dist/ after changing index.ts (dist/ is committed; the test suite
+# fails if it drifts out of sync with the source)
+bun run bundle
 ```
 
 ## License
