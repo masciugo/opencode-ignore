@@ -1,6 +1,8 @@
 import {test, expect, describe, beforeAll} from "bun:test"
 import OpenCodeIgnore from "./index"
 import path from "path"
+import os from "node:os"
+import {mkdtemp, rm} from "node:fs/promises"
 
 // Test data directory is the project root for all tests
 const TEST_PROJECT_ROOT = path.join(process.cwd(), "test-data")
@@ -983,5 +985,35 @@ describe("Structured V2 Result Filtering", () => {
 
     expect(filtered.output).toBe(output)
     expect(filtered.metadata).toBeUndefined()
+  })
+})
+
+describe("Distribution", () => {
+  test("committed dist/ is in sync with index.ts", async () => {
+    const root = process.cwd()
+    const outdir = await mkdtemp(path.join(os.tmpdir(), "opencode-ignore-build-"))
+
+    try {
+      // Same flags as the package.json build script; process.execPath works
+      // whether tests run via npx bun or a locally installed bun
+      const proc = Bun.spawnSync(
+        [process.execPath, "build", "./index.ts", "--outdir", outdir, "--target", "node", "--external=@opencode/plugin"],
+        {cwd: root},
+      )
+      expect(proc.exitCode).toBe(0)
+
+      const built = await Bun.file(path.join(outdir, "index.js")).text()
+      const committedFile = Bun.file(path.join(root, "dist", "index.js"))
+      expect(await committedFile.exists()).toBe(true)
+
+      const committed = await committedFile.text()
+      if (committed !== built) {
+        throw new Error(
+          "dist/index.js is stale - run: npx --yes bun@1.3.1 run build (then commit dist/)",
+        )
+      }
+    } finally {
+      await rm(outdir, {recursive: true, force: true})
+    }
   })
 })

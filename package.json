@@ -9,7 +9,7 @@
   "packageManager": "bun@1.3.1",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lgladysz/opencode-ignore.git"
+    "url": "git+https://github.com/masciugo/opencode-ignore.git"
   },
   "keywords": [
     "opencode",
@@ -18,9 +18,9 @@
     "aiignore",
     "aiexclude"
   ],
-  "homepage": "https://github.com/lgladysz/opencode-ignore#readme",
+  "homepage": "https://github.com/masciugo/opencode-ignore#readme",
   "bugs": {
-    "url": "https://github.com/lgladysz/opencode-ignore/issues"
+    "url": "https://github.com/masciugo/opencode-ignore/issues"
   },
   "scripts": {
     "build": "bun build ./index.ts --outdir ./dist --target node --external=@opencode/plugin",
@@ -29,7 +29,6 @@
   },
   "module": "./dist/index.js",
   "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/index.js",
