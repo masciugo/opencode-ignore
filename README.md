@@ -2,6 +2,8 @@
 
 OpenCode plugin to restrict AI access to files and directories using `.ignore` patterns (gitignore-style).
 
+> Requires **OpenCode V2** (plugin API v2). For migrating from V1, see the [V2 migration guide](https://opencode.ai/v2/docs/migrate-v1).
+
 ## Usage
 
 Add to your OpenCode configuration (`~/.config/opencode/opencode.json`):
@@ -9,7 +11,7 @@ Add to your OpenCode configuration (`~/.config/opencode/opencode.json`):
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugin": [
+  "plugins": [
     "opencode-ignore"
   ]
 }
@@ -129,40 +131,38 @@ api-keys.json
 
 ## Supported Tools
 
-The plugin protects the following OpenCode native tools:
+The plugin protects the following OpenCode V2 native tools:
 
 ### File Operations (Pre-execution blocking)
-- `read` - Blocks reading blocked files
+- `read` - Blocks reading blocked files (also used for directory listing in V2)
 - `write` - Blocks writing to blocked paths
 - `edit` - Blocks editing blocked files
+- `patch` - Blocks patches touching blocked files (paths parsed from `patchText`)
 
 ### Search Operations (Pre-execution + Post-execution filtering)
-- `glob` - Blocks searching in blocked directories, filters blocked files from results
-- `grep` - Blocks searching in blocked directories, filters matches from blocked files
-
-### List Operations (Pre-execution blocking)
-- `list` - Blocks listing blocked directories
+- `glob` - Blocks searching in blocked directories, filters blocked files from structured results and text content
+- `grep` - Blocks searching in blocked directories, filters matches from structured results and text content
 
 **Protection Levels**:
-- **Pre-execution**: Prevents tool from accessing blocked paths entirely (read, write, edit, list)
+- **Pre-execution**: Prevents tool from accessing blocked paths entirely (read, write, edit, patch)
 - **Post-execution**: Allows search but filters blocked files from results (glob, grep)
 - This two-phase approach prevents both direct access and information disclosure
 
-**Note**: Project root (`.`) is always accessible to prevent blocking entire project.
+**Note**: Project root (`.`) is always accessible to prevent blocking entire project. OpenCode V2 has no separate `list` tool — directory listing goes through `read`.
 
 ## How It Works
 
 ### Pre-execution Protection
-1. Plugin loads `.ignore` file from project root before tool execution
-2. Tool paths are normalized to relative paths from project root
+1. Plugin discovers `.ignore` by walking upward from the OpenCode location directory (stopping at the project root) before tool execution
+2. Tool paths are normalized to relative paths from the `.ignore` file location
 3. Paths are checked against ignore patterns using the `ignore` library
 4. If matched, tool execution is blocked with clear error message
 
 ### Post-execution Filtering (glob/grep)
 For `glob` and `grep` tools, additional protection filters results:
 1. Tool executes normally (searching allowed directories)
-2. Results are filtered to remove any files matching `.ignore` patterns
-3. Blocked files are completely removed from output (no partial data leakage)
+2. Both the structured result entries and the text content are filtered to remove anything matching `.ignore` patterns
+3. Blocked files are completely removed from output (no partial data leakage); metadata counts are recomputed and truncation notes are dropped
 4. Empty results returned if all matches are filtered
 
 ### Graceful Degradation
@@ -213,7 +213,7 @@ bun install
 bun test
 
 # Build (if needed)
-bun build index.ts
+bun run build
 ```
 
 ## License
@@ -223,4 +223,5 @@ MIT
 ## Related
 
 - [`ignore`](https://github.com/kaelzhang/node-ignore) - The underlying pattern matching library
-- [OpenCode Plugin Documentation](https://opencode.ai/docs/plugins)
+- [OpenCode V2 Plugin Documentation](https://opencode.ai/v2/docs/build/plugins)
+- [Migrating V1 plugins to V2](https://opencode.ai/v2/docs/migrate-v1)
