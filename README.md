@@ -6,16 +6,38 @@ OpenCode plugin to restrict AI access to files and directories using `.ignore` p
 
 ## Usage
 
-Add to your OpenCode configuration (`~/.config/opencode/opencode.json`):
+Install from GitHub and register it in your OpenCode configuration
+(`~/.config/opencode/opencode.json` for global use, or `opencode.json(c)` in a project):
 
-```json
+```sh
+opencode plugin add github:masciugo/opencode-ignore
+```
+
+Or add it manually to the config:
+
+```jsonc
 {
   "$schema": "https://opencode.ai/config.json",
   "plugins": [
-    "opencode-ignore"
+    "github:masciugo/opencode-ignore"
   ]
 }
 ```
+
+For local development you can point at a checkout instead (relative paths resolve from the config file):
+
+```jsonc
+{
+  "plugins": [
+    "/absolute/path/to/opencode-ignore",
+    "../opencode-ignore"
+  ]
+}
+```
+
+> **Note**: do not use the bare npm package name `"opencode-ignore"` — the version published there
+> targets the legacy OpenCode V1 plugin API and fails to load on V2
+> (`Missing key at ["default"]`). This repository is not published to npm.
 
 Create a `.ignore` file in your project root with patterns to block:
 
